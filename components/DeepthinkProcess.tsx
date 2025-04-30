@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Step, StepStatus } from '../types/Step';
 import StepCard from './StepCard';
 
@@ -30,6 +30,19 @@ const DeepthinkProcess = ({ steps, onUpdate }: DeepthinkProcessProps) => {
     return () => clearInterval(timer);
   }, [countdown, isCountdownActive, isEditing]);
 
+  const startProcess = useCallback(() => {
+    if (steps.length === 0) return;
+    
+    const updatedSteps = steps.map((step, index) => ({
+      ...step,
+      status: index === 0 ? 'running' as StepStatus : 'pending' as StepStatus
+    }));
+    onUpdate(updatedSteps);
+    setCurrentStepIndex(0);
+    setIsProcessRunning(true);
+    setIsProcessComplete(false);
+  }, [steps, onUpdate]);
+
   useEffect(() => {
     if (isProcessRunning) {
       const timer = setInterval(() => {
@@ -46,20 +59,7 @@ const DeepthinkProcess = ({ steps, onUpdate }: DeepthinkProcessProps) => {
 
       return () => clearInterval(timer);
     }
-  }, [isProcessRunning, steps.length]);
-
-  const startProcess = () => {
-    if (steps.length === 0) return;
-    
-    const updatedSteps = steps.map((step, index) => ({
-      ...step,
-      status: index === 0 ? 'running' as StepStatus : 'pending' as StepStatus
-    }));
-    onUpdate(updatedSteps);
-    setCurrentStepIndex(0);
-    setIsProcessRunning(true);
-    setIsProcessComplete(false);
-  };
+  }, [isProcessRunning, steps.length, startProcess]);
 
   const handleStepUpdate = (stepIndex: number, updatedStep: Step) => {
     const updatedSteps = steps.map((step, index) => 
