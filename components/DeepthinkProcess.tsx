@@ -31,28 +31,22 @@ const DeepthinkProcess = ({ steps, onUpdate }: DeepthinkProcessProps) => {
   }, [countdown, isCountdownActive, isEditing]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isProcessRunning && currentStepIndex < steps.length) {
-      timer = setTimeout(() => {
-        const updatedSteps = steps.map((step, index) => {
-          if (index === currentStepIndex) {
-            return { ...step, status: 'completed' as StepStatus };
-          } else if (index === currentStepIndex + 1) {
-            return { ...step, status: 'running' as StepStatus };
+    if (isProcessRunning) {
+      const timer = setInterval(() => {
+        setCurrentStepIndex(prev => {
+          if (prev >= steps.length - 1) {
+            clearInterval(timer);
+            setIsProcessRunning(false);
+            setIsProcessComplete(true);
+            return prev;
           }
-          return step;
+          return prev + 1;
         });
-        onUpdate(updatedSteps);
-        if (currentStepIndex < steps.length - 1) {
-          setCurrentStepIndex(prev => prev + 1);
-        } else {
-          setIsProcessComplete(true);
-          setIsProcessRunning(false);
-        }
       }, 2000);
+
+      return () => clearInterval(timer);
     }
-    return () => clearTimeout(timer);
-  }, [currentStepIndex, isProcessRunning, steps, onUpdate]);
+  }, [isProcessRunning, steps.length]);
 
   const startProcess = () => {
     if (steps.length === 0) return;

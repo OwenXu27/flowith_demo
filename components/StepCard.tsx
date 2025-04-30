@@ -1,7 +1,7 @@
 'use client';
 
 import { Step } from '../types/Step';
-import { CheckCircle2, Loader2, Pencil, Check, X, Plus } from 'lucide-react';
+import { Play, Pause, Loader2, CheckCircle2, Pencil, Check, Plus } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { CheckCircle, Circle } from 'lucide-react';
 
